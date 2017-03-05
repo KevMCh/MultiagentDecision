@@ -1,0 +1,80 @@
+/**
+ * Project of Multi-Agent Decisions
+ * 
+ * Máster Universitario en Ingeniería Informática
+ * E.S.I.T.– INFORMÁ́TICA
+ * Advanced Intelligent Systems
+ * 
+ * Project to develop the conflict of differents agents.
+ * All the agents will give their opinions and through 
+ * the moderator it will lead to the best solution.
+ * 
+ * @author  Kevin M. Ch.
+ * @version 0.0.0
+ * 
+ * Main class.
+ */
+
+import jade.core.Profile;
+import jade.core.ProfileImpl;
+import jade.core.Runtime;
+import jade.wrapper.AgentController;
+import jade.wrapper.ContainerController;
+import jade.wrapper.StaleProxyException;
+
+public class Main {
+  
+  private static final String PORT = "1337";                      // Port to run the agents
+  private static final Integer NUMAGENTS = 5;                     // Number of agents
+  private static final double ACCORD = 0.6;                       // Value of agreement of the agents
+  private static final double DISAGREEMENT = 0.4;                 // Value of disagreement of the agents
+  
+  /**
+   * Main function
+   * @param args
+   */
+  public static void main(String[] args) {
+    Runtime runtime = Runtime.instance();
+    Profile profile = createProfile();
+    ContainerController contrainerController = runtime.createMainContainer(profile);
+    
+    Object[] argsAgent = {NUMAGENTS, ACCORD, DISAGREEMENT};
+    
+    createNewAgent(contrainerController, "Moderator", "agents.ModeratorAgent", argsAgent);
+
+    for(int i = 0; i < NUMAGENTS; i++) {
+      createNewAgent(contrainerController, "Agent" + i, "agents.GeneralAgent", null);
+    }
+  }
+  
+  /**
+   * Function to create a new agent
+   * @param contrainerController
+   * @param name
+   * @param packageAgent
+   * @param numAgents
+   */
+  private static void createNewAgent(ContainerController contrainerController, String name, String packageAgent, Object[] numAgents) {
+    AgentController agentController;
+    
+    try{
+      agentController = contrainerController.createNewAgent(name, packageAgent, numAgents);
+      agentController.start();
+    } catch (StaleProxyException e){
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Create the profile of the jade project
+   * @return profile
+   */
+  private static Profile createProfile() {
+    Profile profile = new ProfileImpl();
+    profile.setParameter(Profile.MAIN_HOST, "localhost");
+    profile.setParameter(Profile.MAIN_PORT, PORT);
+    // profile.setParameter(Profile.GUI, "true");
+    
+    return profile;
+  }
+}

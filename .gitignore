@@ -38,3 +38,9 @@ local.properties
 # TeXlipse plugin
 .texlipse
 ".gitignore" 39L, 458C
+
+.DS_Store
+
+# JADE
+APDescription.txt
+MTPs-Main-Container.txt
