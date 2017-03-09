@@ -36,7 +36,7 @@ public class GeneralAgent extends Agent {
     for (int i = 1; i < 5 ; i++){
       valueOpinion.add((double) i); 
     }
-    
+        
     Opinion opinion = new Opinion();
     opinion.setValueOpinion(valueOpinion);
     

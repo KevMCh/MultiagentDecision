@@ -49,7 +49,7 @@ public class SimilitudeMatrix {
   public void printSimilitudeMatrix(){ 
     for(int i = 0; i < getRows(); i++){
       for(int j = 0; j < getColumns(); j++){
-        System.out.print(getSimilitudeMatrix().get(getPos(i, j)));
+        System.out.print(getItem(i, j));
         
         if(j < getColumns() - 1){
           System.out.print(" - ");
@@ -67,6 +67,16 @@ public class SimilitudeMatrix {
    */
   private int getPos(int row, int column){
     return row * getRows() + column;
+  }
+  
+  /**
+   * Function to return a item of the matrix
+   * @param row
+   * @param column
+   * @return item
+   */
+  public Double getItem(int row, int column) {
+    return getSimilitudeMatrix().get(getPos(row, column));
   }
   
   public Integer getRows() { return rows; }
