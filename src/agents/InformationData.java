@@ -184,15 +184,15 @@ public class InformationData {
   private void updateISAQ(){
     ArrayList<Double> auxISAQ = new ArrayList<Double> ();
     for(int i = 0; i < getAgentSimilarity().getRows(); i++){
+      System.out.println(i);
       Double iISAQ = Double.MIN_VALUE;
       for(int j = 0; j < getAgentSimilarity().getColumns(); j++){
         
         if(!isLower(getAgentSimilarity().getItem(i, j), ALPHA)){
           iISAQ ++;
         }
-        
-        auxISAQ.add(iISAQ / getNumAgents());
       }
+      auxISAQ.add(iISAQ / getNumAgents());
     }
     
     setISAQ(auxISAQ);
@@ -210,9 +210,8 @@ public class InformationData {
         if(isLower(getAgentSimilarity().getItem(i, j), DELTA)){
           iISDQ ++;
         }
-        
-        auxISDQ.add(iISDQ / getNumAgents());
       }
+      auxISDQ.add(iISDQ / getNumAgents());
     }
     
     setISDQ(auxISDQ);
