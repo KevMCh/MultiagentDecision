@@ -15,17 +15,24 @@
  * Main class.
  */
 
+import agents.GeneralAgent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
+import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
 public class Main {
   
+  private static final String MODERATOR = "Moderator";            // Moderator constant
+  private static final String AGENT = "Agent";                    // Agent constant
+  
+  private static final String ADDRESS = "localhost";              // Address to the profile
   private static final String PORT = "1337";                      // Port to run the agents
-  private static final Integer NUMAGENTS = 5;                     // Number of agents
+  
+  private static final Integer NUMAGENTS = 12;                     // Number of agents
   private static final double ACCORD = 0.6;                       // Value of agreement of the agents
   private static final double DISAGREEMENT = 0.4;                 // Value of disagreement of the agents
   
@@ -36,14 +43,14 @@ public class Main {
   public static void main(String[] args) {
     Runtime runtime = Runtime.instance();
     Profile profile = createProfile();
-    ContainerController contrainerController = runtime.createMainContainer(profile);
+    ContainerController containerController = runtime.createMainContainer(profile);
     
     Object[] argsAgent = {NUMAGENTS, ACCORD, DISAGREEMENT};
     
-    createNewAgent(contrainerController, "Moderator", "agents.ModeratorAgent", argsAgent);
+    createNewAgent(containerController, MODERATOR, "agents.ModeratorAgent", argsAgent);
 
-    for(int i = 0; i < NUMAGENTS; i++) {
-      createNewAgent(contrainerController, "Agent" + i, "agents.GeneralAgent", null);
+    for(int i = 1; i <= NUMAGENTS; i++) {
+      createNewAgent(containerController, AGENT + i, "agents.GeneralAgent", null);
     }
   }
   
@@ -71,7 +78,7 @@ public class Main {
    */
   private static Profile createProfile() {
     Profile profile = new ProfileImpl();
-    profile.setParameter(Profile.MAIN_HOST, "localhost");
+    profile.setParameter(Profile.MAIN_HOST, ADDRESS);
     profile.setParameter(Profile.MAIN_PORT, PORT);
     // profile.setParameter(Profile.GUI, "true");
     

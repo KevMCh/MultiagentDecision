@@ -6,7 +6,7 @@ import messages.MessagePack;
 
 public class InformationData {
   
-  private static double ALPHA = 0.8;                    // Value of moderator agreement
+  private static double ALPHA = 0.826;                    // Value of moderator agreement
   private static double DELTA = 0.2;                    // Moderator's disagreement value
   
   private Integer numAgents;                            // Number of agents
@@ -117,15 +117,19 @@ public class InformationData {
    */
   private ArrayList<Double> calculateGroupOpinion() {
     ArrayList<Double> opinionGroup = new ArrayList<Double> ();
-
+    
+    Double valueSquare = 1.0 / getNumAgents();
+    
     for(int i = 0; i < getAllOpinions().get(0).getOpinion().getValueOpinion().size(); i++){
-      Double product = 0.0;
+      Double product = 1.0;
       
       for(int j = 0; j < getAllOpinions().size(); j++){
         product *= allOpinions.get(j).getOpinion().getValueOpinion().get(i);
       }
             
-      opinionGroup.add(Math.pow(product, 1 / getNumAgents()));
+      Double value = Math.pow(product, valueSquare);
+                        
+      opinionGroup.add(value);
     }
     
     return opinionGroup;
@@ -136,13 +140,13 @@ public class InformationData {
    */
   private void updateQSAQ(){
     Double count = 0.0;
-    for(int i = 0; i < getOpinionGroup().size(); i++){
-      if(!isLower(getOpinionGroup().get(i), ALPHA)){
+    for(int i = 0; i < getGroupSimilarity().size(); i++){
+      if(!isLower(getGroupSimilarity().get(i), ALPHA)){
         count ++;
       }
     }
     
-    setQSAQ(count / numAgents);
+    setQSAQ(count / getNumAgents());
   }
   
   /**
@@ -150,8 +154,8 @@ public class InformationData {
    */
   private void updateQSDQ(){
     Double count = 0.0;
-    for(int i = 0; i < getOpinionGroup().size(); i++){
-      if(isLower(getOpinionGroup().get(i), DELTA)){
+    for(int i = 0; i < getGroupSimilarity().size(); i++){
+      if(isLower(getGroupSimilarity().get(i), DELTA)){
         count ++;
       }
     }
@@ -164,12 +168,10 @@ public class InformationData {
    */
   private void updateQSDI(){
     Double auxQSDI = Double.MAX_VALUE;
-    
-    System.out.println(auxQSDI);
-    
+        
     for(int i = 0; i < getAgentSimilarity().getRows(); i++){
       for(int j = 0; j < getAgentSimilarity().getColumns(); j++){
-        if((auxQSDI > getAgentSimilarity().getItem(i, j)) && (i != j)){
+        if(auxQSDI > (getAgentSimilarity().getItem(i, j) - DELTA)){
           auxQSDI = getAgentSimilarity().getItem(i, j);
         }
       }
@@ -184,7 +186,6 @@ public class InformationData {
   private void updateISAQ(){
     ArrayList<Double> auxISAQ = new ArrayList<Double> ();
     for(int i = 0; i < getAgentSimilarity().getRows(); i++){
-      System.out.println(i);
       Double iISAQ = Double.MIN_VALUE;
       for(int j = 0; j < getAgentSimilarity().getColumns(); j++){
         
@@ -204,13 +205,14 @@ public class InformationData {
   private void updateISDQ(){
     ArrayList<Double> auxISDQ = new ArrayList<Double> ();
     for(int i = 0; i < getAgentSimilarity().getRows(); i++){
-      Double iISDQ = Double.MIN_VALUE;
+      Double iISDQ = 0.0;
       for(int j = 0; j < getAgentSimilarity().getColumns(); j++){
         
-        if(isLower(getAgentSimilarity().getItem(i, j), DELTA)){
+        if(isLower(getAgentSimilarity().getItem(i, j), DELTA) && (i != j)){
           iISDQ ++;
         }
       }
+      
       auxISDQ.add(iISDQ / getNumAgents());
     }
     
@@ -221,7 +223,18 @@ public class InformationData {
    * Function to update the degree of stronger disagreement indicator of the decision-maker and the group
    */
   private void updateISDI(){
+    ArrayList<Double> auxISDI = new ArrayList<Double> ();
     
+    for(int i = 0; i < getAgentSimilarity().getRows(); i++){
+      Double iISDI = Double.MAX_VALUE;
+      for(int j = 0; j < getAgentSimilarity().getColumns(); j++){
+        if((iISDI > (getAgentSimilarity().getItem(i, j) - DELTA)) && (i != j)){
+          iISDI = getAgentSimilarity().getItem(i, j);
+        }
+      }
+      auxISDI.add(iISDI);
+    }
+    setISDI(auxISDI);
   }
   
   /**
@@ -264,7 +277,7 @@ public class InformationData {
     double aux2 = 0.0;
     for(int j = 0; j < vector1.size(); j++) {
       aux1 += Math.pow(vector1.get(j), 2);
-      aux2 += Math.pow(vector1.get(j), 2);
+      aux2 += Math.pow(vector2.get(j), 2);
     }
     
     double ang1 = Math.sqrt(aux1);
@@ -290,7 +303,7 @@ public class InformationData {
    */
   private void writeGroupSimilitary() {
     for(int i = 0; i < getGroupSimilarity().size(); i++) {
-      System.out.print(getGroupSimilarity().get(i));
+      System.out.printf("%.3f", getGroupSimilarity().get(i));
       
       if(i < getGroupSimilarity().size() - 1) {
         System.out.print(" - ");
@@ -310,7 +323,7 @@ public class InformationData {
    */
   private void writeISAQ(){
     for(int i = 0; i < getISAQ().size(); i++){
-      System.out.print(getISAQ().get(i));
+      System.out.printf("%.3f", getISAQ().get(i));
       
       if(getISAQ().size() - 1 > i){
         System.out.print(" - ");
@@ -323,7 +336,7 @@ public class InformationData {
    */
   private void writeISDQ(){
     for(int i = 0; i < getISDQ().size(); i++){
-      System.out.print(getISDQ().get(i));
+      System.out.printf("%.3f", getISDQ().get(i));
       
       if(getISDQ().size() - 1 > i){
         System.out.print(" - ");
@@ -337,7 +350,7 @@ public class InformationData {
    */
   private void writeOpinion(ArrayList<Double> opinion){
     for(int i = 0; i < opinion.size(); i++){
-      System.out.print(opinion.get(i));
+      System.out.printf("%.3f", opinion.get(i));
       
       if(i < opinion.size() - 1){
         System.out.print(" - ");
@@ -345,6 +358,22 @@ public class InformationData {
     }
   }
   
+  /**
+   * Print the ISDI
+   */
+  private void writeISDI() {
+    for(int i = 0; i < getISDI().size(); i++){
+      System.out.printf("%.3f", getISDI().get(i));
+      
+      if(i < getISDI().size() - 1){
+        System.out.print(" - ");
+      }
+    }
+  }
+  
+  /**
+   * Print all data
+   */
   public void writeData() {
     System.out.println("\nGroup Opinion:");
     writeOpinion(getOpinionGroup());
@@ -356,23 +385,29 @@ public class InformationData {
     
     System.out.println("\nAgents Similarity:");
     writeAgentSimilitarity();
+    System.out.print("\n");
     
     System.out.println("\nQSAQ:");
-    System.out.println(getQSAQ());
+    System.out.printf("%.2f\n", getQSAQ());
     
     System.out.println("\nQSDQ:");
     System.out.println(getQSDQ());
     
     System.out.println("\nQSDI:");
-    System.out.println(getQSDI());
+    System.out.printf("%.3f\n", getQSDI());
     
     System.out.println("\nISAQ:");
     writeISAQ();
+    System.out.print("\n");
     
     System.out.println("\nISDQ:");
     writeISDQ();
+    System.out.print("\n");
+    
+    System.out.println("\nISDI:");
+    writeISDI();
   }
-  
+
   public ArrayList<MessagePack> getAllOpinions() { return allOpinions; }
 
   public void setAllOpinions(ArrayList<MessagePack> allOpinions) { this.allOpinions = allOpinions; }
@@ -411,8 +446,7 @@ public class InformationData {
 
   public ArrayList<Double> getISDQ() { return ISDQ; }
 
-  public void setISDQ(ArrayList<Double> ISDQ) { this.ISDQ = ISDQ;
-  }
+  public void setISDQ(ArrayList<Double> ISDQ) { this.ISDQ = ISDQ; }
 
   public ArrayList<Double> getISDI() { return ISDI; }
 

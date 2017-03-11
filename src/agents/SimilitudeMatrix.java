@@ -49,11 +49,7 @@ public class SimilitudeMatrix {
   public void printSimilitudeMatrix(){ 
     for(int i = 0; i < getRows(); i++){
       for(int j = 0; j < getColumns(); j++){
-        System.out.print(getItem(i, j));
-        
-        if(j < getColumns() - 1){
-          System.out.print(" - ");
-        }
+        System.out.printf("%.3f \t", getItem(i, j));
       }
       System.out.println();
     }
