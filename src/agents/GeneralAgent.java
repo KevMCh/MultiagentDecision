@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import jade.core.AID;
@@ -80,6 +79,14 @@ public class GeneralAgent extends Agent {
     newOpinion.setValueOpinion(readValues(fileName));
     
     setOpinion(newOpinion);
+  }
+  
+  /**
+   * Write the opinion
+   */
+  protected void writeOpinion() {
+    System.out.println("Opinion:");
+    getOpinion().writeValueOpinion();
   }
   
   /**

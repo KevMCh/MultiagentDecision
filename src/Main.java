@@ -15,6 +15,7 @@
  * Main class.
  */
 
+import agents.ElectreAgent;
 import agents.GeneralAgent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -41,7 +42,10 @@ public class Main {
    * @param args
    */
   public static void main(String[] args) {
-    Runtime runtime = Runtime.instance();
+    
+    ElectreAgent electre = new ElectreAgent ();
+    
+    /* Runtime runtime = Runtime.instance();
     Profile profile = createProfile();
     ContainerController containerController = runtime.createMainContainer(profile);
     
@@ -51,7 +55,7 @@ public class Main {
 
     for(int i = 1; i <= NUMAGENTS; i++) {
       createNewAgent(containerController, AGENT + i, "agents.GeneralAgent", null);
-    }
+    } */
   }
   
   /**

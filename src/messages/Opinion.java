@@ -31,6 +31,15 @@ public class Opinion implements Serializable {
     valueOpinion = new ArrayList<Double> ();
   }
   
+  /**
+   * Write the value of the opinion
+   */
+  public void writeValueOpinion(){
+    for(int i = 0; i < getValueOpinion().size(); i++) {
+      System.out.print(getValueOpinion().get(i));
+    }
+  }
+  
   public ArrayList<Double> getValueOpinion() { return valueOpinion; }
   
   public void setValueOpinion(ArrayList<Double> valueOpinion) { this.valueOpinion = valueOpinion; }

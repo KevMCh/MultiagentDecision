@@ -12,41 +12,50 @@
  * @author  Kevin M. Ch.
  * @version 0.0.0
  * 
- * Class to define the agents message.
+ * Class to define a matrix.
  */
 package agents;
 
 import java.util.ArrayList;
 
-public class SimilitudeMatrix {
+public class Matrix {
   
   private Integer rows;                             // Number of rows
   private Integer columns;                          // Number of columns
-  private ArrayList<Double> similitudeMatrix;       // Matrix to represent the similitude 
+  private ArrayList<Double> matrix;                 // Matrix of items
   
   /**
-   * Default builder
+   * Builder
+   */
+  public Matrix () {
+    rows = 0;
+    columns = 0;
+    matrix = new ArrayList<Double> ();
+  }
+  
+  /**
+   * Builder
    * @param rows
    * @param columns
    */
-  public SimilitudeMatrix (Integer rows, Integer columns) {
+  public Matrix (Integer rows, Integer columns) {
     this.rows = rows;
     this.columns = columns;
-    similitudeMatrix = new ArrayList<Double> ();
+    matrix = new ArrayList<Double> ();
   }
   
   /**
    * Function to add a new matrix item
-   * @param similitudeMatrix
+   * @param matrix
    */
-  public void addSimilitude(Double valueSimilitude) {
-    getSimilitudeMatrix().add(valueSimilitude);
+  public void addItem(Double value) {
+    getMatrix().add(value);
   }
   
   /**
    * Function to print a matrix
    */
-  public void printSimilitudeMatrix(){ 
+  public void printMatrix(){ 
     for(int i = 0; i < getRows(); i++){
       for(int j = 0; j < getColumns(); j++){
         System.out.printf("%.3f \t", getItem(i, j));
@@ -62,7 +71,7 @@ public class SimilitudeMatrix {
    * @return position
    */
   private int getPos(int row, int column){
-    return row * getRows() + column;
+    return row * this.getColumns() + column;
   }
   
   /**
@@ -72,7 +81,17 @@ public class SimilitudeMatrix {
    * @return item
    */
   public Double getItem(int row, int column) {
-    return getSimilitudeMatrix().get(getPos(row, column));
+    return getMatrix().get(getPos(row, column));
+  }
+  
+  /**
+   * Function to update a item
+   * @param row
+   * @param colum
+   * @param item
+   */
+  public void updateItem(int row, int column, Double item) {
+    getMatrix().set(getPos(row, column), item);
   }
   
   public Integer getRows() { return rows; }
@@ -83,7 +102,7 @@ public class SimilitudeMatrix {
 
   public void setColumns(Integer columns) { this.columns = columns; }
   
-  public ArrayList<Double> getSimilitudeMatrix() { return similitudeMatrix; }
+  public ArrayList<Double> getMatrix() { return matrix; }
   
-  public void setSimilitudeMatrix(ArrayList<Double> similitudeMatrix) { this.similitudeMatrix = similitudeMatrix; }
+  public void setMatrix(ArrayList<Double> matrix) { this.matrix = matrix; }
 }

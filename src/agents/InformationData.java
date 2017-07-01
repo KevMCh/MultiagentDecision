@@ -6,7 +6,7 @@ import messages.MessagePack;
 
 public class InformationData {
   
-  private static double ALPHA = 0.826;                    // Value of moderator agreement
+  private static double ALPHA = 0.826;                  // Value of moderator agreement
   private static double DELTA = 0.2;                    // Moderator's disagreement value
   
   private Integer numAgents;                            // Number of agents
@@ -15,7 +15,7 @@ public class InformationData {
   private ArrayList<MessagePack> allOpinions;           // All opinions
   
   private ArrayList<Double> groupSimilarity;            // Similarities with the group
-  private SimilitudeMatrix agentSimilarity;             // Similarities between agents
+  private Matrix agentSimilarity;                       // Similarities between agents
   
   private Double QSAQ;                                  // Degree of strong group agreement
   private Double QSDQ;                                  // Degree of strong group disagreement
@@ -34,7 +34,7 @@ public class InformationData {
     
     this.numAgents = numAgents;
     
-    agentSimilarity = new SimilitudeMatrix(getNumAgents(), getNumAgents());
+    agentSimilarity = new Matrix(getNumAgents(), getNumAgents());
   }
   
   /**
@@ -79,14 +79,10 @@ public class InformationData {
   private void updateAgentsSimilarity() {
     for(int i = 0; i < getNumAgents(); i ++){
       for (int j = 0; j < getNumAgents(); j++){
-        
-        if(i == j) {
-          getAgentSimilarity().addSimilitude(0.0);
-        } else {
-          getAgentSimilarity().addSimilitude(getSimilitude(
-              getAllOpinions().get(i).getOpinion().getValueOpinion(), 
-              getAllOpinions().get(j).getOpinion().getValueOpinion()));
-        }
+                        
+        getAgentSimilarity().addItem(getSimilitude(
+            getAllOpinions().get(i).getOpinion().getValueOpinion(), 
+            getAllOpinions().get(j).getOpinion().getValueOpinion()));
       }
     }
   }
@@ -171,8 +167,8 @@ public class InformationData {
         
     for(int i = 0; i < getAgentSimilarity().getRows(); i++){
       for(int j = 0; j < getAgentSimilarity().getColumns(); j++){
-        if(auxQSDI > (getAgentSimilarity().getItem(i, j) - DELTA)){
-          auxQSDI = getAgentSimilarity().getItem(i, j);
+        if(!isLower(auxQSDI, (getAgentSimilarity().getItem(i, j) - DELTA))){
+          auxQSDI = getAgentSimilarity().getItem(i, j) - DELTA;
         }
       }
     }
@@ -208,7 +204,7 @@ public class InformationData {
       Double iISDQ = 0.0;
       for(int j = 0; j < getAgentSimilarity().getColumns(); j++){
         
-        if(isLower(getAgentSimilarity().getItem(i, j), DELTA) && (i != j)){
+        if(isLower(getAgentSimilarity().getItem(i, j), DELTA)){
           iISDQ ++;
         }
       }
@@ -228,8 +224,8 @@ public class InformationData {
     for(int i = 0; i < getAgentSimilarity().getRows(); i++){
       Double iISDI = Double.MAX_VALUE;
       for(int j = 0; j < getAgentSimilarity().getColumns(); j++){
-        if((iISDI > (getAgentSimilarity().getItem(i, j) - DELTA)) && (i != j)){
-          iISDI = getAgentSimilarity().getItem(i, j);
+        if((!isLower(iISDI, (getAgentSimilarity().getItem(i, j) - DELTA))) && (i != j)){
+          iISDI = getAgentSimilarity().getItem(i, j) - DELTA;
         }
       }
       auxISDI.add(iISDI);
@@ -273,17 +269,22 @@ public class InformationData {
   private double sinAngle (ArrayList<Double> vector1, ArrayList<Double> vector2) {
     double scalar = scalarProduct(vector1, vector2);
         
-    double aux1 = 0.0;
-    double aux2 = 0.0;
+    double norm1 = 0.0;
+    double norm2 = 0.0;
     for(int j = 0; j < vector1.size(); j++) {
-      aux1 += Math.pow(vector1.get(j), 2);
-      aux2 += Math.pow(vector2.get(j), 2);
+      norm1 += Math.pow(vector1.get(j), 2);
+      norm2 += Math.pow(vector2.get(j), 2);
     }
     
-    double ang1 = Math.sqrt(aux1);
-    double ang2= Math.sqrt(aux2);
+    double ang1 = Math.sqrt(norm1);
+    double ang2 = Math.sqrt(norm2);
     
-    double angle = Math.acos(scalar / (ang1 * ang2));
+    Double valueAcos = scalar / (ang1 * ang2);
+    if(valueAcos >= 1) {
+      valueAcos = 1.0;
+    }
+    
+    double angle = Math.acos(valueAcos);
     
     return Math.sin(angle);
   }
@@ -295,7 +296,9 @@ public class InformationData {
    * @return value of similitude
    */
   private double getSimilitude (ArrayList<Double> vector1, ArrayList<Double> vector2) {
-    return 1 - sinAngle (vector1, vector2);    
+    Double resultSinAngle = sinAngle (vector1, vector2);
+    
+    return 1.0 - resultSinAngle;    
   }
   
   /**
@@ -306,7 +309,7 @@ public class InformationData {
       System.out.printf("%.3f", getGroupSimilarity().get(i));
       
       if(i < getGroupSimilarity().size() - 1) {
-        System.out.print(" - ");
+        System.out.print("   ");
       }
     }
   }
@@ -315,7 +318,7 @@ public class InformationData {
    * Print the similarity of the agents between them
    */
   private void writeAgentSimilitarity() {
-    getAgentSimilarity().printSimilitudeMatrix();
+    getAgentSimilarity().printMatrix();
   }
   
   /**
@@ -326,7 +329,7 @@ public class InformationData {
       System.out.printf("%.3f", getISAQ().get(i));
       
       if(getISAQ().size() - 1 > i){
-        System.out.print(" - ");
+        System.out.print("   ");
       }
     }
   }
@@ -339,7 +342,7 @@ public class InformationData {
       System.out.printf("%.3f", getISDQ().get(i));
       
       if(getISDQ().size() - 1 > i){
-        System.out.print(" - ");
+        System.out.print("   ");
       }
     }
   }
@@ -353,7 +356,7 @@ public class InformationData {
       System.out.printf("%.3f", opinion.get(i));
       
       if(i < opinion.size() - 1){
-        System.out.print(" - ");
+        System.out.print(", ");
       }
     }
   }
@@ -366,7 +369,7 @@ public class InformationData {
       System.out.printf("%.3f", getISDI().get(i));
       
       if(i < getISDI().size() - 1){
-        System.out.print(" - ");
+        System.out.print("   ");
       }
     }
   }
@@ -420,9 +423,9 @@ public class InformationData {
 
   public void setGroupSimilarity(ArrayList<Double> groupSimilarity) { this.groupSimilarity = groupSimilarity; }
 
-  public SimilitudeMatrix getAgentSimilarity() { return agentSimilarity; }
+  public Matrix getAgentSimilarity() { return agentSimilarity; }
 
-  public void setAgentSimilarity(SimilitudeMatrix agentSimilarity) { this.agentSimilarity = agentSimilarity; }
+  public void setAgentSimilarity(Matrix agentSimilarity) { this.agentSimilarity = agentSimilarity; }
   
   public Integer getNumAgents() { return numAgents; }
 

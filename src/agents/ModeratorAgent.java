@@ -47,10 +47,9 @@ public class ModeratorAgent extends Agent {
           try {            
             MessagePack messagepack = (MessagePack) msg.getContentObject();
             getData().addNewOpinion(messagepack);
-                         
+                                     
             if(getData().getAllOpinions().size() >= getData().getNumAgents()) {
               getData().calculateGroupInformation();
-              
               getData().writeData();
             }
                       
