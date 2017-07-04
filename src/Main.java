@@ -49,10 +49,11 @@ public class Main {
     /* AHPAgent ahpAgent = new AHPAgent (NUMBEROPTIONS);
     ahpAgent.writeDataAgent(); */
     
-    // ElectreAgent electre = new ElectreAgent ();
+    ElectreAgent electre = new ElectreAgent ();
+    electre.writeAtributtes();
     
-    PrometheeAgent prometheeAgent = new PrometheeAgent ();
-    prometheeAgent.writeData();
+    /* PrometheeAgent prometheeAgent = new PrometheeAgent ();
+    prometheeAgent.writeData(); */
     
     /* Runtime runtime = Runtime.instance();
     Profile profile = createProfile();

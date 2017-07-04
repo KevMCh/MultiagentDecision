@@ -39,6 +39,8 @@ public class ElectreAgent extends GeneralAgent {
   private Matrix dominanceByAgreement;                          // Dominance by agreement matrix
   private Matrix dominanceByDisconcordance;                     // Dominance by disconcordance matrix
   private Matrix aggregateDominance;                            // Aggregate Dominance
+  private ArrayList<Double> strength;                           // Strength of the alternative
+  private ArrayList<Double> weakness;                           // Weakness of the alternative
 
   /**
    * Default build
@@ -67,8 +69,11 @@ public class ElectreAgent extends GeneralAgent {
     createDominanceByDisconcordance();
     
     createAggregateDominance();
-        
-    writeAtributtes();
+    
+    createStrength();
+    createWeakness();
+    
+    createOpinion();
   }
 
   /**
@@ -327,6 +332,86 @@ public class ElectreAgent extends GeneralAgent {
   }
   
   /**
+   * Create strength array of the alternatives
+   */
+  private void createStrength() {
+    setStrength(new ArrayList<Double> ());
+    
+    Double strengthAlternative;
+    
+    for(int row = 0; row < getAggregateDominance().getRows(); row++) {
+      strengthAlternative = 0.0;
+      for(int column = 0; column < getAggregateDominance().getColumns(); column++) {
+        strengthAlternative += getAggregateDominance().getItem(row, column);
+      }
+      
+      getStrength().add(strengthAlternative / (getAggregateDominance().getRows() - 1));
+    }
+  }
+  
+  /**
+   * Create weakness array of the alternatives
+   */
+  private void createWeakness() {
+    setWeakness(new ArrayList<Double> ());
+    
+    Double weaknessAlternative;
+    
+    for(int row = 0; row < getAggregateDominance().getRows(); row++) {
+      weaknessAlternative = 0.0;
+      for(int column = 0; column < getAggregateDominance().getColumns(); column++) {
+        weaknessAlternative += getAggregateDominance().getItem(column, row);
+      }
+      
+      getWeakness().add(weaknessAlternative / (getAggregateDominance().getRows() - 1));
+    }
+  }
+  
+  /**
+   * Create the final opinion of the agent
+   */
+  private void createOpinion() {
+    ArrayList<Double> valueOpinion = new ArrayList<Double> ();
+    
+    for(int i = 0; i < getStrength().size(); i++) {
+      valueOpinion.add(getStrength().get(i) - getWeakness().get(i));
+    }
+    
+    int indexMin = -1;
+    for(int i = 0; i < valueOpinion.size(); i++) {
+      
+      if(valueOpinion.get(i) <= 0.0) {
+        if(indexMin == -1) {
+          indexMin = i;
+        } else if(valueOpinion.get(i) <= valueOpinion.get(indexMin)){
+          
+          indexMin = i;
+        }
+      }
+    }
+    
+    Double toSum = (1 + Math.abs(valueOpinion.get(indexMin)));
+    Double totalSum = 0.0;
+    
+    for(int i = 0; i < valueOpinion.size(); i++) {
+      valueOpinion.set(i,
+          (valueOpinion.get(i) + toSum));
+      
+      totalSum += valueOpinion.get(i);
+    }
+    
+    for(int i = 0; i < valueOpinion.size(); i++) {
+      valueOpinion.set(i,
+          (valueOpinion.get(i) / totalSum));      
+    }
+    
+    Opinion opinion = new Opinion ();
+    opinion.setValueOpinion(valueOpinion);
+    
+    setOpinion(opinion);
+  }
+  
+  /**
    * Write all atributtes
    */
   public void writeAtributtes() {
@@ -338,6 +423,9 @@ public class ElectreAgent extends GeneralAgent {
     writeDominanceByAgreement();
     writeDominanceByDisconcordance();
     writeAggregateDominance();
+    writeStrength();
+    writeWeakness();
+    writeOpinion();
   }
 
   /**
@@ -388,22 +476,53 @@ public class ElectreAgent extends GeneralAgent {
     System.out.println();
   }
   
+  /**
+   * Write the dominance by agreement matrix of the alternatives
+   */
   private void writeDominanceByAgreement() {
     System.out.println("Dominance By Agreement:");
     getDominanceByAgreement().printMatrix();
     System.out.println();
   }
   
+  /**
+   * Write the dominance by disconcordance matrix of the alternatives
+   */
   private void writeDominanceByDisconcordance() {
     System.out.println("Dominance By Disconcordance:");
     getDominanceByDisconcordance().printMatrix();
     System.out.println();
   }
   
+  /**
+   * Write the aggregate dominance matrix of the alternatives
+   */
   private void writeAggregateDominance() {
     System.out.println("Aggregate dominance:");
     getAggregateDominance().printMatrix();
     System.out.println();
+  }
+  
+  /**
+   * Write the strength of the alternatives
+   */
+  private void writeStrength() {
+    System.out.println("Strength of the alternatives:");
+    for(int i = 0; i < getStrength().size(); i++) {
+      System.out.print(getStrength().get(i) + " ");
+    }
+    System.out.println("\n");
+  }
+  
+  /**
+   * Write the weakness of the alternatives
+   */
+  private void writeWeakness() {
+    System.out.println("Weakness of the alternatives:");
+    for(int i = 0; i < getWeakness().size(); i++) {
+      System.out.print(getWeakness().get(i) + " ");
+    }
+    System.out.println("\n");
   }
 
   public ArrayList<Importance> getImportances() { return importances; }
@@ -437,4 +556,12 @@ public class ElectreAgent extends GeneralAgent {
   public Matrix getAggregateDominance() { return aggregateDominance; }
 
   public void setAggregateDominance(Matrix aggregateDominance) { this.aggregateDominance = aggregateDominance; }
+  
+  public ArrayList<Double> getStrength() { return strength; }
+
+  public void setStrength(ArrayList<Double> strength) { this.strength = strength; }
+
+  public ArrayList<Double> getWeakness() { return weakness; }
+
+  public void setWeakness(ArrayList<Double> weakness) { this.weakness = weakness; }
 }
