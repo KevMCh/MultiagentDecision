@@ -60,7 +60,7 @@ public class Matrix {
       for(int j = 0; j < getColumns(); j++){
         System.out.printf("%.3f \t", getItem(i, j));
       }
-      System.out.println();
+      System.out.println("\n");
     }
   }
   
@@ -92,6 +92,31 @@ public class Matrix {
    */
   public void updateItem(int row, int column, Double item) {
     getMatrix().set(getPos(row, column), item);
+  }
+  
+  /**
+   * Function to normalize the matrix
+   * @param matrix
+   */
+  protected Matrix normalizeMatrix() {
+    Matrix normalizeMatrix = new Matrix (getRows(),
+        getColumns());
+
+    for(int i = 0; i < getRows(); i++) {
+      for(int j = 0; j < getColumns(); j++) {
+        
+        Double item = getItem(i, j);
+        Double sumSquare = 0.0;
+            for(int k = 0; k < getRows(); k++) {
+              sumSquare += Math.pow(getItem(k, j), 2);
+            }
+
+        item = item / (Math.sqrt(sumSquare));
+        normalizeMatrix.addItem(item);
+      }
+    }
+
+    return normalizeMatrix;    
   }
   
   public Integer getRows() { return rows; }

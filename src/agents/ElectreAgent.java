@@ -56,7 +56,7 @@ public class ElectreAgent extends GeneralAgent {
   private void createOpinion(String fileName) {
     readValues(fileName, getImportances(), getCharacteristics());
     
-    normalizeMatrix();
+    setCharacteristics(getCharacteristics().normalizeMatrix());
     weighMatrix();
 
     createAgreementMatrix();
@@ -191,30 +191,6 @@ public class ElectreAgent extends GeneralAgent {
     } catch (IOException e) {
       e.printStackTrace();
     }    
-  }
-  
-  /**
-   * Function to normalize the matrix
-   */
-  private void normalizeMatrix() {
-    Matrix normalizeMatrix = new Matrix (getCharacteristics().getRows(),
-                                         getCharacteristics().getColumns());
-    
-    for(int i = 0; i < getCharacteristics().getRows(); i++) {
-      for(int j = 0; j < getCharacteristics().getColumns(); j++) {
-
-        Double item = getCharacteristics().getItem(i, j);
-        Double sumSquare = 0.0;
-        for(int k = 0; k < getCharacteristics().getRows(); k++) {
-          sumSquare += Math.pow(getCharacteristics().getItem(k, j), 2);
-        }
-        
-        item = item / (Math.sqrt(sumSquare));
-        normalizeMatrix.addItem(item);
-      }
-    }
-    
-    setCharacteristics(normalizeMatrix);
   }
   
   /**
@@ -368,9 +344,9 @@ public class ElectreAgent extends GeneralAgent {
    * Write the importances
    */
   private void writeImportances() {
-    System.out.println("Importances");
+    System.out.println("Importances:");
     for(int i = 0; i < getImportances().size(); i++){
-      System.out.println("\tItem " + i + ":");
+      System.out.println("\tItem: " + i + ":");
       getImportances().get(i).writeImportance();
     }
     System.out.println();
@@ -380,7 +356,7 @@ public class ElectreAgent extends GeneralAgent {
    * Write characteristics
    */
   private void writeCharacteristics() {
-    System.out.println("Characteristics");
+    System.out.println("Characteristics:");
     getCharacteristics().printMatrix();
     System.out.println();
   }
@@ -389,7 +365,7 @@ public class ElectreAgent extends GeneralAgent {
    * Write the agreement
    */
   private void writeAgreement() {
-    System.out.println("Agreement");
+    System.out.println("Agreement:");
     getAgreement().printMatrix();
     System.out.println();
   }
@@ -398,7 +374,7 @@ public class ElectreAgent extends GeneralAgent {
    * Write disconcordance
    */
   private void writeDisconcordance() {
-    System.out.println("Disconcordance");
+    System.out.println("Disconcordance:");
     getDisconcordance().printMatrix();
     System.out.println();
   }
@@ -407,25 +383,25 @@ public class ElectreAgent extends GeneralAgent {
    * Write index of disconcordance
    */
   private void writeIndexDisconcordance() {
-    System.out.println("Index of disconcordance");
+    System.out.println("Index of disconcordance:");
     getIndexDisconcordance().printMatrix();
     System.out.println();
   }
   
   private void writeDominanceByAgreement() {
-    System.out.println("Dominance By Agreement");
+    System.out.println("Dominance By Agreement:");
     getDominanceByAgreement().printMatrix();
     System.out.println();
   }
   
   private void writeDominanceByDisconcordance() {
-    System.out.println("Dominance By Disconcordance");
+    System.out.println("Dominance By Disconcordance:");
     getDominanceByDisconcordance().printMatrix();
     System.out.println();
   }
   
   private void writeAggregateDominance() {
-    System.out.println("Aggregate dominance");
+    System.out.println("Aggregate dominance:");
     getAggregateDominance().printMatrix();
     System.out.println();
   }

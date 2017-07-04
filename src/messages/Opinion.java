@@ -36,7 +36,7 @@ public class Opinion implements Serializable {
    */
   public void writeValueOpinion(){
     for(int i = 0; i < getValueOpinion().size(); i++) {
-      System.out.print(getValueOpinion().get(i));
+      System.out.print(getValueOpinion().get(i) + " ");
     }
   }
   

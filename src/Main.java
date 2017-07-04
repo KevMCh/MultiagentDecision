@@ -15,8 +15,10 @@
  * Main class.
  */
 
+import agents.AHPAgent;
 import agents.ElectreAgent;
 import agents.GeneralAgent;
+import agents.PrometheeAgent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
@@ -33,9 +35,10 @@ public class Main {
   private static final String ADDRESS = "localhost";              // Address to the profile
   private static final String PORT = "1337";                      // Port to run the agents
   
-  private static final Integer NUMAGENTS = 12;                     // Number of agents
+  private static final Integer NUMAGENTS = 12;                    // Number of agents
   private static final double ACCORD = 0.6;                       // Value of agreement of the agents
   private static final double DISAGREEMENT = 0.4;                 // Value of disagreement of the agents
+  private static final int NUMBEROPTIONS = 4;                     // Number of options
   
   /**
    * Main function
@@ -43,7 +46,13 @@ public class Main {
    */
   public static void main(String[] args) {
     
-    ElectreAgent electre = new ElectreAgent ();
+    /* AHPAgent ahpAgent = new AHPAgent (NUMBEROPTIONS);
+    ahpAgent.writeDataAgent(); */
+    
+    // ElectreAgent electre = new ElectreAgent ();
+    
+    PrometheeAgent prometheeAgent = new PrometheeAgent ();
+    prometheeAgent.writeData();
     
     /* Runtime runtime = Runtime.instance();
     Profile profile = createProfile();
