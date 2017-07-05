@@ -16,11 +16,15 @@
  */
 package agents;
 
+import java.io.IOException;
+
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import messages.MessagePack;
+import messages.Opinion;
 
 public class ModeratorAgent extends Agent {
   
@@ -32,7 +36,6 @@ public class ModeratorAgent extends Agent {
   @Override
   protected void setup() {
     Object[] args = getArguments();
-    
     setAccord((double) args[1]);
     setDisagreement((double) args[2]);
     
@@ -40,7 +43,7 @@ public class ModeratorAgent extends Agent {
     
     addBehaviour(new CyclicBehaviour() {
       @Override
-      public void action (){
+      public void action () {
         ACLMessage msg = receive();
         
         if(msg != null){
@@ -51,6 +54,20 @@ public class ModeratorAgent extends Agent {
             if(getData().getAllOpinions().size() >= getData().getNumAgents()) {
               getData().calculateGroupInformation();
               getData().writeData();
+              
+              if(getData().getQSAQ() > getAccord()) {
+                int idSolution = searchSolution();
+                System.out.println("The solution is the alternative " + idSolution + ".");
+                
+              } else {
+                int idAgent = searchISDIAgent();
+                System.out.println("\nModify agent " + idAgent + "\n");
+                String identififierAgent = getData().getAllOpinions().get(idAgent).getName();
+                
+                getData().getAllOpinions().remove(idAgent);
+                
+                sendMessageToAgent(identififierAgent);
+              }
             }
                       
           } catch (UnreadableException e) {
@@ -61,6 +78,63 @@ public class ModeratorAgent extends Agent {
         }
       }
     });
+  }
+  
+  /**
+   * Function to send a message with the opinion to a agent
+   * @param nameAgent
+   */
+  public void sendMessageToAgent (String nameAgent){
+    Opinion opinion = new Opinion ();
+    opinion.setValueOpinion(getData().getOpinionGroup());
+    
+    MessagePack message = new MessagePack(this.getName(), opinion);
+    
+    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+
+    try {
+      msg.setContentObject(message);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    msg.addReceiver(new AID(nameAgent, AID.ISLOCALNAME));
+    send(msg);
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  private int searchISDIAgent() {
+    int idAgent = 0;
+    Double min = Double.MAX_VALUE;
+    
+    for(int i = 0; i < getData().getISDI().size(); i++) {
+      if(getData().getISDI().get(i) < min) {
+        min = getData().getISDI().get(i);
+        idAgent = i;
+      }
+    }
+    
+    return idAgent;
+  }
+  
+  /**
+   * Search the best solution of the alternativities
+   * @return
+   */
+  private int searchSolution() {
+    int idAlternative = 0;
+    Double max = Double.MIN_VALUE;
+    
+    for(int i = 0; i < getData().getOpinionGroup().size(); i++) {
+      if(getData().getOpinionGroup().get(i) > max) {
+        max = getData().getISDI().get(i);
+        idAlternative = i;
+      }
+    }
+    
+    return idAlternative;
   }
   
   public double getAccord() { return accord; }

@@ -170,6 +170,9 @@ public class PrometheeAgent extends GeneralAgent {
   public Double preferenceFunctionIII(Double value) {
     if(value > ALPHA) {
       return 1.0;
+      
+    } else if(value < 0.0) {
+      return 0.0;
     }
     
     return value / ALPHA;

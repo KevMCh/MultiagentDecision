@@ -27,7 +27,7 @@ import jade.wrapper.ContainerController;
 import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
-public class Main {
+public class GroupDecisionSystem {
   
   private static final String MODERATOR = "Moderator";            // Moderator constant
   private static final String AGENT = "Agent";                    // Agent constant
@@ -36,7 +36,7 @@ public class Main {
   private static final String PORT = "1337";                      // Port to run the agents
   
   private static final Integer NUMAGENTS = 12;                    // Number of agents
-  private static final double ACCORD = 0.6;                       // Value of agreement of the agents
+  private static final double ACCORD = 0.85;                      // Value of agreement of the agents
   private static final double DISAGREEMENT = 0.4;                 // Value of disagreement of the agents
   private static final int NUMBEROPTIONS = 4;                     // Number of options
   
@@ -49,13 +49,13 @@ public class Main {
     /* AHPAgent ahpAgent = new AHPAgent (NUMBEROPTIONS);
     ahpAgent.writeDataAgent(); */
     
-    ElectreAgent electre = new ElectreAgent ();
-    electre.writeAtributtes();
+    /* ElectreAgent electre = new ElectreAgent ();
+    electre.writeAtributtes(); */
     
     /* PrometheeAgent prometheeAgent = new PrometheeAgent ();
     prometheeAgent.writeData(); */
     
-    /* Runtime runtime = Runtime.instance();
+    Runtime runtime = Runtime.instance();
     Profile profile = createProfile();
     ContainerController containerController = runtime.createMainContainer(profile);
     
@@ -64,8 +64,9 @@ public class Main {
     createNewAgent(containerController, MODERATOR, "agents.ModeratorAgent", argsAgent);
 
     for(int i = 1; i <= NUMAGENTS; i++) {
-      createNewAgent(containerController, AGENT + i, "agents.GeneralAgent", null);
-    } */
+      Object[] argsAgentClient = { AGENT + i };
+      createNewAgent(containerController, AGENT + i, "agents.GeneralAgent", argsAgentClient);
+    }
   }
   
   /**

@@ -25,9 +25,10 @@ import java.util.ArrayList;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
-
+import jade.lang.acl.UnreadableException;
 import messages.MessagePack;
 import messages.Opinion;
 
@@ -36,10 +37,16 @@ public class GeneralAgent extends Agent {
   protected static final String MODERATOR = "Moderator";      // Moderator constant
   protected static final String PATHFILES = "/src/files/";    // Path to the files
   
+  private static final Double RANGEOFCHANGE = 0.2;            // Moderator constant
+  
+  private String identifier;                                  // Name of the agent
   private Opinion opinion;                                    // Value opinion
 
   @Override
   protected void setup() {
+    Object[] args = getArguments();
+    setIdentifier((String) args[0]);
+    
     MessagePack message = new MessagePack(this.getName(), opinion);
 
     addBehaviour(new OneShotBehaviour() {
@@ -50,15 +57,38 @@ public class GeneralAgent extends Agent {
         sendMessageToAgent (MODERATOR);
       }
     });
+    
+    addBehaviour(new CyclicBehaviour() {
+      @Override
+      public void action () {
+        ACLMessage msg = receive();
+        
+        if(msg != null){
+          
+          try {            
+            MessagePack messagepack = (MessagePack) msg.getContentObject();
+            
+            modifyPersonalOpinion(getOpinion(), messagepack.getOpinion().getValueOpinion());
+            sendMessageToAgent(MODERATOR);
+                      
+          } catch (UnreadableException e) {
+            e.printStackTrace();
+          }
+          
+        } else {
+          block();
+        }
+      }
+    });
   }
   
   /**
-   * Function to send a message to a agent
+   * Function to send a message with the opinion to a agent
    * @param nameAgent
    */
-  public void sendMessageToAgent (String nameAgent){
+  public void sendMessageToAgent(String nameAgent){
     
-    MessagePack message = new MessagePack(this.getName(), getOpinion());
+    MessagePack message = new MessagePack(this.getIdentifier(), getOpinion());
     
     ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 
@@ -79,6 +109,22 @@ public class GeneralAgent extends Agent {
     newOpinion.setValueOpinion(readValues(fileName));
     
     setOpinion(newOpinion);
+  }
+  
+  private void modifyPersonalOpinion(Opinion opinion, ArrayList<Double> valueOpinion) {
+    int indexMax = 0;
+    Double maxDifference = Double.MIN_VALUE;
+    
+    for(int i = 0; i < valueOpinion.size(); i++) {
+      if(Math.abs(opinion.getValueOpinion().get(i) - valueOpinion.get(i)) < maxDifference) {
+        maxDifference = Math.abs(opinion.getValueOpinion().get(i) - valueOpinion.get(i));
+        indexMax = i;
+      }
+    }
+    
+    opinion.getValueOpinion().set(indexMax, opinion.getValueOpinion().get(indexMax) + RANGEOFCHANGE);
+    
+    setOpinion(opinion);
   }
   
   /**
@@ -125,5 +171,13 @@ public class GeneralAgent extends Agent {
   public Opinion getOpinion() { return opinion; }
 
   public void setOpinion(Opinion opinion) { this.opinion = opinion; }
+  
+  public String getIdentifier() {
+    return identifier;
+  }
+
+  public void setIdentifier(String identifier) {
+    this.identifier = identifier;
+  }
 
 }

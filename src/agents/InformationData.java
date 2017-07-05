@@ -6,8 +6,8 @@ import messages.MessagePack;
 
 public class InformationData {
   
-  private static double ALPHA = 0.826;                  // Value of moderator agreement
-  private static double DELTA = 0.2;                    // Moderator's disagreement value
+  private static double ALPHA = 0.87;                  // Value of moderator agreement
+  private static double DELTA = 0.2;                   // Moderator's disagreement value
   
   private Integer numAgents;                            // Number of agents
   
@@ -29,12 +29,8 @@ public class InformationData {
    * @param numAgents
    */
   public InformationData(Integer numAgents) {
-    allOpinions = new ArrayList<MessagePack> ();
-    groupSimilarity = new ArrayList<Double> ();
-    
+    allOpinions = new ArrayList<MessagePack> ();   
     this.numAgents = numAgents;
-    
-    agentSimilarity = new Matrix(getNumAgents(), getNumAgents());
   }
   
   /**
@@ -49,8 +45,10 @@ public class InformationData {
    * Function to calculate all the data of the final decision
    */
   public void calculateGroupInformation() {
+    initializeData();
+    
     setOpinionGroup(calculateGroupOpinion());
-
+    
     updateGroupSimilarity();
     updateAgentsSimilarity();
     
@@ -62,10 +60,25 @@ public class InformationData {
     updateISDI();
   }
   
+  private void initializeData() {
+    setOpinionGroup(null);        setOpinionGroup(new ArrayList<Double> ());               
+    setGroupSimilarity(null);     setGroupSimilarity(new ArrayList<Double> ()); 
+    setAgentSimilarity(null);     setAgentSimilarity(new Matrix(getNumAgents(), getNumAgents()));
+    
+    setQSAQ(null);                setQSAQ(0.0);
+    setQSDQ(null);                setQSDI(0.0);
+    setQSDI(null);                setQSDI(0.0);
+    setISAQ(null);                setISAQ(new ArrayList<Double> ());
+    setISDQ(null);                setISDQ(new ArrayList<Double> ());
+    setISDI(null);                setISDI(new ArrayList<Double> ());
+  }
+
   /**
    * Function to update the GroupSimilitary
    */
   private void updateGroupSimilarity() {
+    setGroupSimilarity(new ArrayList<Double> ());
+    
     for (int i = 0; i < getNumAgents(); i++){
         getGroupSimilarity().add(
             getSimilitude(getAllOpinions().get(i).getOpinion().getValueOpinion(),
@@ -77,6 +90,8 @@ public class InformationData {
    * Function to update the AgentsSimilitary
    */
   private void updateAgentsSimilarity() {
+    setAgentSimilarity(new Matrix(getNumAgents(), getNumAgents()));
+    
     for(int i = 0; i < getNumAgents(); i ++){
       for (int j = 0; j < getNumAgents(); j++){
                         
@@ -113,16 +128,16 @@ public class InformationData {
    */
   private ArrayList<Double> calculateGroupOpinion() {
     ArrayList<Double> opinionGroup = new ArrayList<Double> ();
-    
+        
     Double valueSquare = 1.0 / getNumAgents();
     
     for(int i = 0; i < getAllOpinions().get(0).getOpinion().getValueOpinion().size(); i++){
       Double product = 1.0;
       
       for(int j = 0; j < getAllOpinions().size(); j++){
-        product *= allOpinions.get(j).getOpinion().getValueOpinion().get(i);
+        product *= getAllOpinions().get(j).getOpinion().getValueOpinion().get(i);
       }
-            
+                  
       Double value = Math.pow(product, valueSquare);
                         
       opinionGroup.add(value);
@@ -409,6 +424,7 @@ public class InformationData {
     
     System.out.println("\nISDI:");
     writeISDI();
+    System.out.println("\n");
   }
 
   public ArrayList<MessagePack> getAllOpinions() { return allOpinions; }
